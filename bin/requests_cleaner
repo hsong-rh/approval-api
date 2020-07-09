@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+lib = File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+require "bundler/setup"
+require File.expand_path('../config/environment', __dir__)
+
+begin
+  days = Integer(ARGV.shift)
+
+  if days.zero?
+    puts "Not allowed to delete all requests in this task"
+    exit
+  end
+
+  requests = Request.where("created_at < ?", Time.zone.today - days)
+  puts "Requests older than #{days} days will be deleted: #{requests.pluck(:id)}"
+  requests.destroy_all
+end
+
